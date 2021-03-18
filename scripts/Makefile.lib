@@ -284,6 +284,8 @@ DTC_FLAGS += -Wno-unit_address_vs_reg \
 	-Wno-simple_bus_reg \
 	-Wno-unit_address_format \
 	-Wno-gpios_property \
+	-Wno-graph_child_address \
+	-Wno-graph_port \
 	-Wno-pci_bridge \
 	-Wno-pci_device_bus_num \
 	-Wno-pci_device_reg \
