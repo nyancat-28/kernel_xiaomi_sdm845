@@ -6,11 +6,7 @@
 
 # Config
 DEVICE="beryllium"
-DEVICE2="polaris"
-DEVICE3="dipper"
 DEFCONFIG="${DEVICE}_defconfig"
-DEFCONFIG2="${DEVICE2}_defconfig"
-DEFCONFIG3="${DEVICE3}_defconfig"
 LOG="$HOME/log.txt"
 
 # Export arch and subarch
@@ -20,7 +16,7 @@ export ARCH SUBARCH
 
 KERNEL_IMG=$KERNEL_DIR/out/arch/$ARCH/boot/Image.gz-dtb
 
-TG_CHAT_ID="-1001192543759"
+TG_CHAT_ID="-1001183168884"
 TG_BOT_TOKEN="$BOT_API_KEY"
 # End config
 
@@ -67,18 +63,10 @@ build_kernel() {
 
     make O=out $DEFCONFIG -j$(nproc --all)
     BUILD_START=$(date +"%s")
-	echo $TC_DIR
     make -j$(nproc --all) O=out \
-                PATH="$TC_DIR/bin:$PATH" \
-                CC="clang" \
-                CROSS_COMPILE=$TC_DIR/bin/aarch64-linux-gnu- \
-                CROSS_COMPILE_ARM32=$TC_DIR/bin/arm-linux-gnueabi- \
-                LLVM=llvm- \
-                AR=llvm-ar \
-                NM=llvm-nm \
-                OBJCOPY=llvm-objcopy \
-                OBJDUMP=llvm-objdump \
-                STRIP=llvm-strip |& tee $LOG
+                PATH="$GCC32_DIR/bin:$GCC64_DIR/bin:$PATH" \
+                CROSS_COMPILE=$GCC64_DIR/bin/aarch64-elf- \
+                CROSS_COMPILE_ARM32=$GCC32_DIR/bin/arm-eabi- |& tee $LOG
 
     BUILD_END=$(date +"%s")
     DIFF=$((BUILD_END - BUILD_START))
@@ -96,10 +84,9 @@ build_end() {
 
     echo -e "\n> Build successful! generating flashable zip..."
 	cd "$AK_DIR" || echo -e "\nAnykernel directory ($AK_DIR) does not exist" || exit 1
-	git clean -fd
-	mv "$KERNEL_IMG" "$AK_DIR"/zImage
+	mv "$KERNEL_IMG" "$AK_DIR"
 	ZIP_NAME=$KERNELNAME-$1-$COMMIT_SHA.zip
-	zip -r9 "$ZIP_NAME" ./* -x .git README.md ./*placeholder
+	zip -r "$ZIP_NAME" *
 	tg_pushzip "$ZIP_NAME"
 	echo -e "\n> Sent zip through Telegram.\n> File: $ZIP_NAME"
 	tg_buildtime
@@ -127,13 +114,3 @@ $CAPTION"
 build_setup $DEFCONFIG
 build_kernel
 build_end $DEVICE
-
-# Build device 1
-build_setup $DEFCONFIG2
-build_kernel
-build_end $DEVICE2
-
-# Build device 1
-build_setup $DEFCONFIG3
-build_kernel
-build_end $DEVICE3

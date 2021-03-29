@@ -1,0 +1,17 @@
+kind: pipeline
+name: mi845 Drone
+
+clone:
+  depth: 1
+
+steps:
+ - name: compile
+   image: ubuntu:rolling
+   environment:
+     BOT_API_KEY:
+       from_secret: BOT_API_KEY
+   commands:
+      - apt-get update -qq
+      - apt-get install --no-install-recommends -y -qq ca-certificates git make bc zip curl gcc libc6-dev python3-minimal libssl-dev flex bison
+      - cd /drone/src
+      - bash kernel_setup.sh
