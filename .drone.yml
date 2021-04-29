@@ -6,7 +6,7 @@ clone:
 
 steps:
  - name: compile
-   image: ubuntu:rolling
+   image: ubuntu:latest
    environment:
      BOT_API_KEY:
        from_secret: BOT_API_KEY
